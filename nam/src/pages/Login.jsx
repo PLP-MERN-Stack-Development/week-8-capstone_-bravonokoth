@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
@@ -8,7 +8,7 @@ import { useToast } from '../components/Toast';
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -19,21 +19,19 @@ const Login = () => {
   const location = useLocation();
   const { success, error } = useToast();
 
-  // Get the intended destination or default to home
   const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
-    // Clear error when user starts typing
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -57,7 +55,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -66,15 +64,16 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
-      
+
       if (result.success) {
-        success(`Welcome back, ${result.user.name}!`);
+        success(`Welcome back, ${result.data.user.name}!`);
         navigate(from, { replace: true });
       } else {
         error(result.message || 'Login failed. Please try again.');
       }
     } catch (err) {
-      error('An unexpected error occurred. Please try again.');
+      error(err.message || 'An unexpected error occurred. Please try again.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +81,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 bg-hero-pattern opacity-5"></div>
-      
+      <div className="absolute inset-0 bg-hero-pattern opacity-5" aria-hidden="true"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -98,7 +97,7 @@ const Login = () => {
             transition={{ delay: 0.2, type: 'spring', stiffness: 500, damping: 30 }}
             className="mx-auto w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6"
           >
-            <span className="text-2xl">🐟</span>
+            <span className="text-2xl" aria-hidden="true">🐟</span>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -138,6 +137,8 @@ const Login = () => {
                   onChange={handleChange}
                   className={`input-floating peer ${errors.email ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Email address"
+                  aria-invalid={errors.email ? 'true' : 'false'}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 <label htmlFor="email" className="label-floating">
                   Email address
@@ -145,6 +146,7 @@ const Login = () => {
               </div>
               {errors.email && (
                 <motion.p
+                  id="email-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -166,6 +168,8 @@ const Login = () => {
                   onChange={handleChange}
                   className={`input-floating peer pr-12 ${errors.password ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Password"
+                  aria-invalid={errors.password ? 'true' : 'false'}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
                 />
                 <label htmlFor="password" className="label-floating">
                   Password
@@ -176,6 +180,7 @@ const Login = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="w-5 h-5" />
@@ -186,6 +191,7 @@ const Login = () => {
               </div>
               {errors.password && (
                 <motion.p
+                  id="password-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"

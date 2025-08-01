@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline';
@@ -12,7 +12,7 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
     deliveryAddress: '',
-    phone: ''
+    phone: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,16 +25,15 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
-    // Clear error when user starts typing
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -42,21 +41,18 @@ const Signup = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters';
     }
 
-    // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
@@ -65,21 +61,18 @@ const Signup = () => {
       newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
     }
 
-    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
-    // Delivery address validation
     if (!formData.deliveryAddress.trim()) {
       newErrors.deliveryAddress = 'Delivery address is required';
     } else if (formData.deliveryAddress.trim().length < 10) {
       newErrors.deliveryAddress = 'Please provide a complete delivery address';
     }
 
-    // Phone validation (optional but if provided, must be valid)
     if (formData.phone && !/^(\+254|0)[17]\d{8}$/.test(formData.phone)) {
       newErrors.phone = 'Please enter a valid Kenyan phone number';
     }
@@ -90,7 +83,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -100,15 +93,14 @@ const Signup = () => {
     try {
       const { confirmPassword, ...registrationData } = formData;
       const result = await register(registrationData);
-      
+
       if (result.success) {
         success(`Welcome to FreshCatch, ${result.user.name}!`);
         navigate('/');
       } else {
         if (result.errors && result.errors.length > 0) {
-          // Handle validation errors from server
           const serverErrors = {};
-          result.errors.forEach(err => {
+          result.errors.forEach((err) => {
             serverErrors[err.field] = err.message;
           });
           setErrors(serverErrors);
@@ -118,6 +110,7 @@ const Signup = () => {
       }
     } catch (err) {
       error('An unexpected error occurred. Please try again.');
+      console.error('Registration error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -126,13 +119,13 @@ const Signup = () => {
   const getPasswordStrength = () => {
     const password = formData.password;
     let strength = 0;
-    
+
     if (password.length >= 6) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
-    
+
     return strength;
   };
 
@@ -152,8 +145,8 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 bg-hero-pattern opacity-5"></div>
-      
+      <div className="absolute inset-0 bg-hero-pattern opacity-5" aria-hidden="true"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -168,7 +161,7 @@ const Signup = () => {
             transition={{ delay: 0.2, type: 'spring', stiffness: 500, damping: 30 }}
             className="mx-auto w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6"
           >
-            <span className="text-2xl">🐟</span>
+            <span className="text-2xl" aria-hidden="true">🐟</span>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -208,6 +201,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer ${errors.name ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Full name"
+                  aria-invalid={errors.name ? 'true' : 'false'}
+                  aria-describedby={errors.name ? 'name-error' : undefined}
                 />
                 <label htmlFor="name" className="label-floating">
                   Full name
@@ -215,6 +210,7 @@ const Signup = () => {
               </div>
               {errors.name && (
                 <motion.p
+                  id="name-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -236,6 +232,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer ${errors.email ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Email address"
+                  aria-invalid={errors.email ? 'true' : 'false'}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 <label htmlFor="email" className="label-floating">
                   Email address
@@ -243,6 +241,7 @@ const Signup = () => {
               </div>
               {errors.email && (
                 <motion.p
+                  id="email-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -264,6 +263,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer pr-12 ${errors.password ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Password"
+                  aria-invalid={errors.password ? 'true' : 'false'}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
                 />
                 <label htmlFor="password" className="label-floating">
                   Password
@@ -274,6 +275,7 @@ const Signup = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="w-5 h-5" />
@@ -282,7 +284,7 @@ const Signup = () => {
                   )}
                 </motion.button>
               </div>
-              
+
               {/* Password Strength Indicator */}
               {formData.password && (
                 <div className="mt-2">
@@ -299,9 +301,10 @@ const Signup = () => {
                   </div>
                 </div>
               )}
-              
+
               {errors.password && (
                 <motion.p
+                  id="password-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -323,6 +326,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer pr-12 ${errors.confirmPassword ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Confirm password"
+                  aria-invalid={errors.confirmPassword ? 'true' : 'false'}
+                  aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
                 />
                 <label htmlFor="confirmPassword" className="label-floating">
                   Confirm password
@@ -333,6 +338,7 @@ const Signup = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                 >
                   {showConfirmPassword ? (
                     <EyeSlashIcon className="w-5 h-5" />
@@ -340,8 +346,7 @@ const Signup = () => {
                     <EyeIcon className="w-5 h-5" />
                   )}
                 </motion.button>
-                
-                {/* Password Match Indicator */}
+
                 {formData.confirmPassword && formData.password === formData.confirmPassword && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -354,6 +359,7 @@ const Signup = () => {
               </div>
               {errors.confirmPassword && (
                 <motion.p
+                  id="confirmPassword-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -374,6 +380,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer resize-none ${errors.deliveryAddress ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Delivery address"
+                  aria-invalid={errors.deliveryAddress ? 'true' : 'false'}
+                  aria-describedby={errors.deliveryAddress ? 'deliveryAddress-error' : undefined}
                 />
                 <label htmlFor="deliveryAddress" className="label-floating">
                   Delivery address
@@ -381,6 +389,7 @@ const Signup = () => {
               </div>
               {errors.deliveryAddress && (
                 <motion.p
+                  id="deliveryAddress-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"
@@ -402,6 +411,8 @@ const Signup = () => {
                   onChange={handleChange}
                   className={`input-floating peer ${errors.phone ? 'border-error-500 focus:border-error-500' : ''}`}
                   placeholder="Phone number (optional)"
+                  aria-invalid={errors.phone ? 'true' : 'false'}
+                  aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
                 <label htmlFor="phone" className="label-floating">
                   Phone number (optional)
@@ -409,6 +420,7 @@ const Signup = () => {
               </div>
               {errors.phone && (
                 <motion.p
+                  id="phone-error"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-2 text-sm text-error-600"

@@ -1,10 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../utils/api.js';
 
-// Create the Auth Context
 const AuthContext = createContext();
 
-// Custom hook to use the Auth Context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -13,49 +11,10 @@ export const useAuth = () => {
   return context;
 };
 
-// Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('fishDeliveryToken'));
-
-  // Configure axios defaults
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-  
-  // Set up axios interceptor for authentication
-  useEffect(() => {
-    const interceptor = axios.interceptors.request.use(
-      (config) => {
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-
-    // Cleanup
-    return () => axios.interceptors.request.eject(interceptor);
-  }, [token]);
-
-  // Set up axios response interceptor for handling auth errors
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          // Token is invalid or expired
-          logout();
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    // Cleanup
-    return () => axios.interceptors.response.eject(interceptor);
-  }, []);
 
   // Check if user is authenticated on app load
   useEffect(() => {
@@ -66,20 +25,15 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await axios.get(`${API_BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        const response = await authAPI.verifyToken(token);
         if (response.data.success) {
           setUser(response.data.data.user);
         } else {
-          // Invalid token
           localStorage.removeItem('fishDeliveryToken');
           setToken(null);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Remove invalid token
         localStorage.removeItem('fishDeliveryToken');
         setToken(null);
       } finally {
@@ -88,25 +42,18 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuth();
-  }, [token, API_BASE_URL]);
+  }, [token]);
 
   // Login function
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-        email,
-        password
-      });
-
+      const response = await authAPI.login({ email, password });
       if (response.data.success) {
         const { user: userData, token: authToken } = response.data.data;
-        
-        // Store token in localStorage
         localStorage.setItem('fishDeliveryToken', authToken);
         setToken(authToken);
         setUser(userData);
-
         return { success: true, user: userData };
       } else {
         return { success: false, message: response.data.message };
@@ -123,19 +70,15 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
-
+      const response = await authAPI.register(userData);
       if (response.data.success) {
         const { user: newUser, token: authToken } = response.data.data;
-        
-        // Store token in localStorage
         localStorage.setItem('fishDeliveryToken', authToken);
         setToken(authToken);
         setUser(newUser);
-
         return { success: true, user: newUser };
       } else {
-        return { success: false, message: response.data.message };
+        return { success: false, message: response.data.message, errors: response.data.errors || [] };
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed. Please try again.';
@@ -157,8 +100,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (updateData) => {
     try {
       setLoading(true);
-      const response = await axios.put(`${API_BASE_URL}/users/me`, updateData);
-
+      const response = await authAPI.updateProfile(updateData);
       if (response.data.success) {
         const updatedUser = response.data.data.user;
         setUser(updatedUser);
@@ -208,7 +150,6 @@ export const AuthProvider = ({ children }) => {
     isAdmin,
     isClient,
     isAuthenticated,
-    API_BASE_URL
   };
 
   return (

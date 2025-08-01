@@ -215,7 +215,7 @@ server.listen(PORT, () => {
   console.log(`🔗 Socket.io server ready for connections`);
   
   if (process.env.NODE_ENV === 'development') {
-    console.log(`📱 Frontend URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
+    console.log(`📱 Frontend URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
     console.log(`🔍 Health check: http://localhost:${PORT}/health`);
     console.log(`📚 API endpoints: http://localhost:${PORT}/api`);
   }
