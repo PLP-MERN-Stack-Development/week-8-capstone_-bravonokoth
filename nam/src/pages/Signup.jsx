@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion }
+
+ from 'framer-motion';
 import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
@@ -199,8 +201,7 @@ const Signup = () => {
                   autoComplete="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`input-floating peer ${errors.name ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Full name"
+                  className={`input-floating ${errors.name ? 'border-error-500' : ''}`}
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
                 />
@@ -230,8 +231,7 @@ const Signup = () => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`input-floating peer ${errors.email ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Email address"
+                  className={`input-floating ${errors.email ? 'border-error-500' : ''}`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
@@ -261,8 +261,7 @@ const Signup = () => {
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`input-floating peer pr-12 ${errors.password ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Password"
+                  className={`input-floating pr-12 ${errors.password ? 'border-error-500' : ''}`}
                   aria-invalid={errors.password ? 'true' : 'false'}
                   aria-describedby={errors.password ? 'password-error' : undefined}
                 />
@@ -324,8 +323,7 @@ const Signup = () => {
                   autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`input-floating peer pr-12 ${errors.confirmPassword ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Confirm password"
+                  className={`input-floating pr-12 ${errors.confirmPassword ? 'border-error-500' : ''}`}
                   aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                   aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
                 />
@@ -378,8 +376,7 @@ const Signup = () => {
                   rows={3}
                   value={formData.deliveryAddress}
                   onChange={handleChange}
-                  className={`input-floating peer resize-none ${errors.deliveryAddress ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Delivery address"
+                  className={`input-floating resize-none ${errors.deliveryAddress ? 'border-error-500' : ''}`}
                   aria-invalid={errors.deliveryAddress ? 'true' : 'false'}
                   aria-describedby={errors.deliveryAddress ? 'deliveryAddress-error' : undefined}
                 />
@@ -409,8 +406,7 @@ const Signup = () => {
                   autoComplete="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`input-floating peer ${errors.phone ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Phone number (optional)"
+                  className={`input-floating ${errors.phone ? 'border-error-500' : ''}`}
                   aria-invalid={errors.phone ? 'true' : 'false'}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />

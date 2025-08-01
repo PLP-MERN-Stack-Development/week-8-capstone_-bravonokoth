@@ -135,8 +135,7 @@ const Login = () => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`input-floating peer ${errors.email ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Email address"
+                  className={`input-floating ${errors.email ? 'border-error-500' : ''}`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
@@ -166,8 +165,7 @@ const Login = () => {
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`input-floating peer pr-12 ${errors.password ? 'border-error-500 focus:border-error-500' : ''}`}
-                  placeholder="Password"
+                  className={`input-floating pr-12 ${errors.password ? 'border-error-500' : ''}`}
                   aria-invalid={errors.password ? 'true' : 'false'}
                   aria-describedby={errors.password ? 'password-error' : undefined}
                 />
@@ -271,18 +269,7 @@ const Login = () => {
         </motion.div>
 
         {/* Demo Credentials */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="bg-blue-50 border border-blue-200 rounded-lg p-4"
-        >
-          <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>
-          <div className="text-xs text-blue-700 space-y-1">
-            <p><strong>Client:</strong> client@example.com / Password123</p>
-            <p><strong>Admin:</strong> admin@example.com / Password123</p>
-          </div>
-        </motion.div>
+       
       </motion.div>
     </div>
   );
