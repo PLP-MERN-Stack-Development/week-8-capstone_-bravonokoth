@@ -1,7 +1,14 @@
 import axios from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!API_BASE_URL) {
+  console.error('🚨 Error: VITE_API_URL environment variable is not set');
+  throw new Error('VITE_API_URL is not defined');
+}
+
+console.log('API Base URL:', API_BASE_URL); // Debug
 
 // Create axios instance with default config
 const api = axios.create({
